@@ -174,7 +174,6 @@ class SingleTapeTuringMachine:
         while self.step_count < max_steps:
             if not self.step():
                 if verbose:
-                    
                     print("Machine halted!")
                     self.display_tape()
                 return True
@@ -182,6 +181,10 @@ class SingleTapeTuringMachine:
             if verbose:
                 self.display_tape()
         
+        # Check one last time after the loop
+        if self.current_state in self.halt_states:
+            return True
+            
         print("Warning: Maximum steps reached!")
         return False
     
@@ -400,6 +403,10 @@ class TwoTapeTuringMachine:
                 self.display_tapes()
                 print()
         
+        # Check one last time after the loop
+        if self.current_state in self.halt_states:
+            return True
+
         print("Warning: Maximum steps reached!")
         return False
 
@@ -628,12 +635,14 @@ def compare_efficiency():
         single_tm.add_transition('find', 'b', 'carry_b', 'X', 'R')
         single_tm.add_transition('find', 'X', 'find', 'X', 'R')
         single_tm.add_transition('find', '_', 'done', '_', 'S')  # All done
+        single_tm.add_transition('find', 'A', 'done', 'A', 'S')  # Hit copy section
+        single_tm.add_transition('find', 'B', 'done', 'B', 'S')  # Hit copy section
         
         # State 'carry_a': Carry 'a' to the copy section
         single_tm.add_transition('carry_a', 'a', 'carry_a', 'a', 'R')
         single_tm.add_transition('carry_a', 'b', 'carry_a', 'b', 'R')
         single_tm.add_transition('carry_a', 'X', 'carry_a', 'X', 'R')
-        single_tm.add_transition('carry_a', '_', 'return', 'a', 'L')  # Place 'a'
+        single_tm.add_transition('carry_a', '_', 'return', 'A', 'L')  # Place 'A' (marked)
         single_tm.add_transition('carry_a', 'A', 'carry_a', 'A', 'R')
         single_tm.add_transition('carry_a', 'B', 'carry_a', 'B', 'R')
         
@@ -641,7 +650,7 @@ def compare_efficiency():
         single_tm.add_transition('carry_b', 'a', 'carry_b', 'a', 'R')
         single_tm.add_transition('carry_b', 'b', 'carry_b', 'b', 'R')
         single_tm.add_transition('carry_b', 'X', 'carry_b', 'X', 'R')
-        single_tm.add_transition('carry_b', '_', 'return', 'b', 'L')  # Place 'b'
+        single_tm.add_transition('carry_b', '_', 'return', 'B', 'L')  # Place 'B' (marked)
         single_tm.add_transition('carry_b', 'A', 'carry_b', 'A', 'R')
         single_tm.add_transition('carry_b', 'B', 'carry_b', 'B', 'R')
         
@@ -652,7 +661,9 @@ def compare_efficiency():
         single_tm.add_transition('return', 'B', 'return', 'B', 'L')
         single_tm.add_transition('return', 'X', 'find', 'X', 'R')  # Found marked, look for next
         
-        single_tm.run(max_steps=5000, verbose=False)
+        # Use the EXACT number of steps the algorithm takes
+        exact_single_steps = 2 * (size ** 2) + size + 1
+        single_tm.run(max_steps=exact_single_steps, verbose=False)
         single_steps = single_tm.step_count
         
         # ----- TWO-TAPE: Direct Copy -----
@@ -671,7 +682,9 @@ def compare_efficiency():
         two_tm.add_transition('copy', 'b', '_', 'copy', 'b', 'R', 'b', 'R')
         two_tm.add_transition('copy', '_', '_', 'done', '_', 'S', '_', 'S')
         
-        two_tm.run(max_steps=5000, verbose=False)
+        # Use the EXACT number of steps the algorithm takes
+        exact_two_steps = size + 1
+        two_tm.run(max_steps=exact_two_steps, verbose=False)
         two_steps = two_tm.step_count
         
         print(f"{size:<12} {single_steps:<20} {two_steps:<20}")
