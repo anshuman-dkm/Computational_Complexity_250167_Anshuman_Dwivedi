@@ -502,12 +502,12 @@ def palindrome_example():
     # State 'copy': Copy each symbol from Tape 1 to Tape 2
     for symbol in ['a', 'b', 'c', 'd']:  # Add more symbols as needed
         tm.add_transition('copy', symbol, '_', 'copy', symbol, 'R', symbol, 'R')
-    tm.add_transition('copy', '_', '_', 'reset', '_', 'L', '_', 'L')
+    tm.add_transition('copy', '_', '_', 'reset', '_', 'L', '_', 'S')
     
     # Phase 2: Reset - Move Tape 1 head back to beginning, Tape 2 stays at end
     for symbol in ['a', 'b', 'c', 'd']:
         tm.add_transition('reset', symbol, '_', 'reset', symbol, 'L', '_', 'S')
-    tm.add_transition('reset', '_', '_', 'compare', '_', 'R', '_', 'S')
+    tm.add_transition('reset', '_', '_', 'compare', '_', 'R', '_', 'L')
     
     # Phase 3: Compare - Match Tape 1 (forward) with Tape 2 (backward)
     for symbol in ['a', 'b', 'c', 'd']:
@@ -554,11 +554,11 @@ def palindrome_example():
     # Add same transitions
     for symbol in ['a', 'b', 'c', 'd']:
         tm2.add_transition('copy', symbol, '_', 'copy', symbol, 'R', symbol, 'R')
-    tm2.add_transition('copy', '_', '_', 'reset', '_', 'L', '_', 'L')
+    tm2.add_transition('copy', '_', '_', 'reset', '_', 'L', '_', 'S')
     
     for symbol in ['a', 'b', 'c', 'd']:
         tm2.add_transition('reset', symbol, '_', 'reset', symbol, 'L', '_', 'S')
-    tm2.add_transition('reset', '_', '_', 'compare', '_', 'R', '_', 'S')
+    tm2.add_transition('reset', '_', '_', 'compare', '_', 'R', '_', 'L')
     
     for symbol in ['a', 'b', 'c', 'd']:
         tm2.add_transition('compare', symbol, symbol, 'compare', symbol, 'R', symbol, 'L')
